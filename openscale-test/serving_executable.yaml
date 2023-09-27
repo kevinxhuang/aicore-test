@@ -1,0 +1,40 @@
+apiVersion: ai.sap.com/v1alpha1
+kind: ServingTemplate
+metadata:
+  name: openscale-test-230927
+  annotations:
+    scenarios.ai.sap.com/description: "Custom ML Engine"
+    scenarios.ai.sap.com/name: "openscale-test"
+    executables.ai.sap.com/description: "Custom ML Engine executable"
+    executables.ai.sap.com/name: "openscale-test-exectuable"
+  labels:
+    scenarios.ai.sap.com/id: "openscale-test"
+    ai.sap.com/version: "1.0.0"
+spec:
+  inputs:
+    parameters:
+      - name: greetmessage # placeholder name
+        type: string
+  template:
+    apiVersion: "serving.kserve.io/v1beta1"
+    metadata:
+      labels: |
+        ai.sap.com/resourcePlan: starter # computing power
+    spec: |
+      predictor:
+        imagePullSecrets:
+          - name: openscale-test-secret
+        containers:
+        - name: kserve-container
+          image: "kevinxhuang/demo:openscale_test"
+          ports:
+            - containerPort: 7000    # customizable port
+              protocol: TCP
+          command: ["/bin/sh", "-c"]
+          args:
+            - >
+              set -e && echo "Starting" && gunicorn --chdir /app/src auto:app -b 0.0.0.0:7000
+          env:
+            - name: greetingmessage # different name to avoid confusion
+              value: "{{inputs.parameters.greetmessage}}"
+

@@ -23,7 +23,7 @@ spec:
     spec: |
       predictor:
         imagePullSecrets:
-          - name: aicore-test-github_cred
+          - name: aicore-test-github-cred
         containers:
         - name: kserve-container
           image: "kevinxhuang/demo:openscale_test"
